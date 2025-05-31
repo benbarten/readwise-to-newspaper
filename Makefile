@@ -1,4 +1,4 @@
-.PHONY: help build run clean test yesterday week month env-example env-check
+.PHONY: help build run clean test yesterday week month env-example env-check print
 
 # Load .env file if it exists
 ifneq (,$(wildcard ./.env))
@@ -15,6 +15,7 @@ help:
 	@echo "  make yesterday     - Run with articles from yesterday (requires READWISE_TOKEN)"
 	@echo "  make week          - Run with articles from last 7 days (requires READWISE_TOKEN)"
 	@echo "  make month         - Run with articles from last 30 days (requires READWISE_TOKEN)"
+	@echo "  make print         - Print the generated PDF to default printer"
 	@echo "  make clean         - Clean up generated files"
 	@echo "  make test          - Run tests"
 	@echo "  make env-example   - Create a sample .env file"
@@ -27,6 +28,7 @@ help:
 	@echo "Examples:"
 	@echo "  READWISE_TOKEN=your_token make yesterday"
 	@echo "  make env-example && vi .env && make week"
+	@echo "  make week && make print   # Generate and print newspaper"
 	@echo ""
 	@if [ -f .env ]; then \
 		echo "✅ .env file found - environment variables will be loaded automatically"; \
@@ -139,8 +141,20 @@ test:
 clean:
 	rm -f readwise-to-newspaper
 	rm -f daily-tech-digest.html
+	rm -f daily-tech-digest.pdf
 
 # Install dependencies
 deps:
 	go mod download
-	go mod tidy 
+	go mod tidy
+
+# Print the generated PDF
+print:
+	@if [ ! -f daily-tech-digest.pdf ]; then \
+		echo "Error: daily-tech-digest.pdf not found"; \
+		echo "Generate it first with: make week (or yesterday/month)"; \
+		exit 1; \
+	fi
+	@echo "Printing daily-tech-digest.pdf to default printer..."
+	lpr daily-tech-digest.pdf
+	@echo "✅ PDF sent to printer successfully!" 
