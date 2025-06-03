@@ -1,0 +1,21 @@
+{
+  "name": "daily-tech-digest",
+  "version": "1.0.0",
+  "description": "A web application that fetches articles from Readwise and displays them in a 4-column layout",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "keywords": [
+    "readwise",
+    "newspaper",
+    "articles",
+    "digest"
+  ],
+  "author": "",
+  "license": "MIT"
+} 

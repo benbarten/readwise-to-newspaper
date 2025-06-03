@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Tech Digest</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Mono', 'Monaco', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', 'Source Code Pro', 'Consolas', monospace;
+            line-height: 1.2;
+            background-color: #ffffff;
+            color: #2d3748;
+            font-size: 8px;
+            letter-spacing: 0;
+            padding: 4px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 4px;
+        }
+
+        .page {
+            display: block;
+            margin-bottom: 16px;
+            height: 800px;
+            overflow: hidden;
+            page-break-after: always;
+            column-count: 4;
+            column-gap: 8px;
+            column-fill: auto;
+        }
+
+        .column {
+            display: none;
+        }
+
+        .article {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 1px;
+            padding: 4px;
+            margin-bottom: 4px;
+            width: 100%;
+            box-sizing: border-box;
+            break-inside: auto;
+            page-break-inside: auto;
+        }
+
+        .article-title {
+            font-size: 9px;
+            font-weight: 600;
+            margin: 0 0 2px 0;
+            line-height: 1.1;
+            color: #1a202c;
+            border-bottom: 1px solid #cbd5e0;
+            padding-bottom: 1px;
+            word-wrap: break-word;
+            break-after: avoid;
+            page-break-after: avoid;
+        }
+
+        .article-meta {
+            font-size: 6px;
+            color: #718096;
+            margin-bottom: 2px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px;
+        }
+
+        .article-meta .author {
+            font-weight: 500;
+        }
+
+        .article-meta .date,
+        .article-meta .word-count {
+            opacity: 0.8;
+        }
+
+        .article-summary {
+            font-size: 7px;
+            margin-bottom: 2px;
+            padding: 2px;
+            background-color: #edf2f7;
+            border-left: 1px solid #4299e1;
+            border-radius: 0 1px 1px 0;
+            line-height: 1.2;
+            font-style: italic;
+            word-wrap: break-word;
+        }
+
+        .article-content {
+            font-size: 7px;
+            line-height: 1.2;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .article-content * {
+            font-family: inherit !important;
+            font-size: inherit !important;
+        }
+
+        .article-content h1,
+        .article-content h2,
+        .article-content h3,
+        .article-content h4,
+        .article-content h5,
+        .article-content h6 {
+            margin: 2px 0 1px 0;
+            font-weight: 600;
+            color: #2d3748;
+            word-wrap: break-word;
+        }
+
+        .article-content p {
+            margin-bottom: 2px;
+            word-wrap: break-word;
+        }
+
+        .article-content blockquote {
+            margin: 2px 0;
+            padding: 1px 2px;
+            border-left: 1px solid #a0aec0;
+            background-color: #f7fafc;
+            font-style: italic;
+            word-wrap: break-word;
+        }
+
+        .article-content code {
+            background-color: #edf2f7;
+            padding: 0px 1px;
+            border-radius: 1px;
+            font-family: inherit;
+            word-break: break-all;
+        }
+
+        .article-content pre {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            padding: 2px;
+            border-radius: 1px;
+            overflow-x: auto;
+            margin: 2px 0;
+            font-family: inherit;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .article-content ul,
+        .article-content ol {
+            margin: 2px 0;
+            padding-left: 8px;
+        }
+
+        .article-content li {
+            margin-bottom: 0px;
+            word-wrap: break-word;
+        }
+
+        .article-content a {
+            color: #3182ce;
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .article-content a:hover {
+            text-decoration: underline;
+        }
+
+        .article-content img {
+            max-width: 100%;
+            width: 100%;
+            height: auto;
+            margin: 2px 0;
+            border-radius: 1px;
+            border: 1px solid #e2e8f0;
+            display: block;
+            object-fit: cover;
+            max-height: 120px;
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+
+        .controls input,
+        .controls button {
+            font-family: inherit;
+            font-size: 10px;
+            padding: 8px 12px;
+            margin: 4px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+        }
+
+        .controls button {
+            background: #4299e1;
+            color: white;
+            cursor: pointer;
+        }
+
+        .controls button:hover {
+            background: #3182ce;
+        }
+
+        .controls button:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            text-align: center;
+            font-size: 12px;
+            color: #718096;
+            margin: 24px 0;
+        }
+
+        .error {
+            text-align: center;
+            font-size: 11px;
+            color: #e53e3e;
+            margin: 24px 0;
+            padding: 12px;
+            background: #fed7d7;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 8px;
+            }
+            
+            .article {
+                margin-bottom: 16px;
+            }
+            
+            body {
+                padding: 8px;
+            }
+        }
+
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+
+            @page {
+                size: letter;
+                margin: 0.15in;
+            }
+
+            body {
+                font-size: 4.5px !important;
+                line-height: 1.0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: white !important;
+                color: black !important;
+            }
+
+            .controls {
+                display: none !important;
+            }
+
+            #loading,
+            #error {
+                display: none !important;
+            }
+
+            .container {
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                column-count: 4 !important;
+                column-gap: 3px !important;
+                column-fill: auto !important;
+            }
+
+            .page {
+                display: block !important;
+                margin-bottom: 0 !important;
+                max-height: none !important;
+                overflow: visible !important;
+                page-break-after: always !important;
+                break-after: page !important;
+                column-count: 4 !important;
+                column-gap: 3px !important;
+                column-fill: auto !important;
+            }
+
+            .column {
+                display: none !important;
+            }
+
+            .article {
+                background: white !important;
+                border: 0.25px solid #000 !important;
+                border-radius: 0 !important;
+                padding: 1px !important;
+                margin-bottom: 2px !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+                break-inside: auto !important;
+                page-break-inside: auto !important;
+            }
+
+            .article-title {
+                font-size: 5.5px !important;
+                font-weight: bold !important;
+                margin: 0 0 1px 0 !important;
+                line-height: 0.9 !important;
+                color: black !important;
+                border-bottom: 0.25px solid #000 !important;
+                padding-bottom: 0.5px !important;
+                break-after: avoid !important;
+                page-break-after: avoid !important;
+            }
+
+            .article-meta {
+                font-size: 3.5px !important;
+                color: #333 !important;
+                margin-bottom: 1px !important;
+                display: block !important;
+                break-after: avoid !important;
+                page-break-after: avoid !important;
+            }
+
+            .article-summary {
+                font-size: 4px !important;
+                margin-bottom: 1px !important;
+                padding: 1px !important;
+                background-color: #f8f8f8 !important;
+                border-left: 0.5px solid #000 !important;
+                border-radius: 0 !important;
+                line-height: 0.9 !important;
+                font-style: italic !important;
+                break-after: avoid !important;
+            }
+
+            .article-content {
+                font-size: 4px !important;
+                line-height: 1.0 !important;
+                word-wrap: break-word !important;
+                overflow-wrap: break-word !important;
+            }
+
+            .article-content * {
+                font-family: inherit !important;
+                font-size: 4px !important;
+            }
+
+            .article-content h1,
+            .article-content h2,
+            .article-content h3,
+            .article-content h4,
+            .article-content h5,
+            .article-content h6 {
+                margin: 1px 0 0.5px 0 !important;
+                font-weight: bold !important;
+                color: black !important;
+                break-after: avoid !important;
+                page-break-after: avoid !important;
+                font-size: 4.5px !important;
+            }
+
+            .article-content p {
+                margin-bottom: 0.5px !important;
+                orphans: 1;
+                widows: 1;
+            }
+
+            .article-content blockquote {
+                margin: 0.5px 0 !important;
+                padding: 0.5px 1px !important;
+                border-left: 0.25px solid #000 !important;
+                background-color: #f8f8f8 !important;
+                font-style: italic !important;
+                font-size: 3.5px !important;
+            }
+
+            .article-content code {
+                background-color: #f8f8f8 !important;
+                padding: 0px !important;
+                border-radius: 0 !important;
+                font-family: inherit !important;
+                word-break: break-all !important;
+                font-size: 3.5px !important;
+            }
+
+            .article-content pre {
+                background-color: #f8f8f8 !important;
+                color: black !important;
+                padding: 1px !important;
+                border-radius: 0 !important;
+                border: 0.25px solid #000 !important;
+                overflow: visible !important;
+                margin: 0.5px 0 !important;
+                font-family: inherit !important;
+                white-space: pre-wrap !important;
+                word-wrap: break-word !important;
+                font-size: 3.5px !important;
+            }
+
+            .article-content ul,
+            .article-content ol {
+                margin: 0.5px 0 !important;
+                padding-left: 4px !important;
+            }
+
+            .article-content li {
+                margin-bottom: 0px !important;
+                font-size: 4px !important;
+            }
+
+            .article-content a {
+                color: black !important;
+                text-decoration: underline !important;
+                word-break: break-all !important;
+            }
+
+            .article-content img {
+                max-width: 100% !important;
+                width: 100% !important;
+                height: auto !important;
+                max-height: 30px !important;
+                margin: 0.5px 0 !important;
+                border: 0.25px solid #000 !important;
+                border-radius: 0 !important;
+                display: block !important;
+                object-fit: cover !important;
+            }
+
+            /* Keep article titles with their content */
+            .article-title {
+                break-inside: avoid !important;
+                break-after: avoid !important;
+            }
+
+            .article-meta + .article-summary,
+            .article-meta + .article-content {
+                break-before: avoid !important;
+            }
+
+            /* Allow breaking anywhere to maximize space usage */
+            * {
+                page-break-inside: auto !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <input type="text" id="readwiseToken" placeholder="Enter Readwise Token" style="width: 300px;">
+        <input type="number" id="daysBack" placeholder="Days back" value="7" min="1" max="365" style="width: 100px;">
+        <button onclick="fetchArticles()">Fetch Articles</button>
+        <button onclick="loadTokenFromEnv()" style="background: #38a169;">Load from .env</button>
+        <br>
+        <small>Get your token from: <a href="https://readwise.io/access_token" target="_blank">https://readwise.io/access_token</a></small>
+        <div id="env-status" style="margin-top: 8px; font-size: 9px; color: #718096;"></div>
+    </div>
+
+    <div id="loading" class="loading" style="display: none;">
+        Fetching articles...
+    </div>
+
+    <div id="error" class="error" style="display: none;"></div>
+
+    <div id="container" class="container"></div>
+
+    <script>
+        // Utility function to format dates
+        function formatDate(dateValue) {
+            if (!dateValue) return '';
+            
+            let date;
+            if (typeof dateValue === 'string') {
+                date = new Date(dateValue);
+            } else if (typeof dateValue === 'number') {
+                date = new Date(dateValue * 1000);
+            } else {
+                return '';
+            }
+            
+            if (isNaN(date.getTime())) return '';
+            
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        // Clean HTML content
+        function cleanHTML(html) {
+            if (!html) return '';
+            
+            // Create a temporary div to parse HTML
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            
+            // Remove script and style tags
+            const scripts = tempDiv.querySelectorAll('script, style');
+            scripts.forEach(el => el.remove());
+            
+            return tempDiv.innerHTML;
+        }
+
+        // Create article HTML
+        function createArticleHTML(article) {
+            const publishedDate = formatDate(article.published_date);
+            const cleanContent = cleanHTML(article.html_content);
+            
+            return `
+                <div class="article">
+                    <h2 class="article-title">${article.title || 'Untitled'}</h2>
+                    <div class="article-meta">
+                        ${article.author ? `<span class="author">${article.author}</span>` : ''}
+                        ${publishedDate ? `<span class="date">${publishedDate}</span>` : ''}
+                        ${article.word_count ? `<span class="word-count">${article.word_count}w</span>` : ''}
+                    </div>
+                    ${article.summary ? `
+                        <div class="article-summary">
+                            ${article.summary}
+                        </div>
+                    ` : ''}
+                    <div class="article-content">
+                        ${cleanContent}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render articles with CSS columns and page breaks
+        function renderArticles(articles) {
+            const container = document.getElementById('container');
+            container.innerHTML = '';
+            
+            if (articles.length === 0) {
+                return;
+            }
+            
+            // Create first page
+            let currentPage = createNewPage();
+            let currentPageHeight = 0;
+            
+            articles.forEach(article => {
+                const articleHTML = createArticleHTML(article);
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = articleHTML;
+                const articleElement = tempDiv.firstElementChild;
+                
+                // Estimate article height
+                const estimatedHeight = estimateArticleHeight(article);
+                
+                // Check if we need a new page
+                if (currentPageHeight + estimatedHeight > 780) { // Leave some margin
+                    // Add current page to container
+                    container.appendChild(currentPage);
+                    
+                    // Create new page
+                    currentPage = createNewPage();
+                    currentPageHeight = 0;
+                }
+                
+                // Add article to current page
+                currentPage.appendChild(articleElement);
+                currentPageHeight += estimatedHeight;
+            });
+            
+            // Add the last page
+            if (currentPage.children.length > 0) {
+                container.appendChild(currentPage);
+            }
+        }
+        
+        // Create a new page element
+        function createNewPage() {
+            const pageElement = document.createElement('div');
+            pageElement.className = 'page';
+            return pageElement;
+        }
+        
+        // Estimate article height for layout calculation
+        function estimateArticleHeight(article) {
+            let height = 0;
+            
+            // Title height
+            height += 15;
+            
+            // Meta height
+            height += 10;
+            
+            // Summary height (if present)
+            if (article.summary) {
+                height += Math.ceil(article.summary.length / 50) * 8;
+            }
+            
+            // Content height estimation
+            if (article.html_content) {
+                // Count images
+                const imageCount = (article.html_content.match(/<img/g) || []).length;
+                height += imageCount * 125;
+                
+                // Text content estimation
+                const textLength = article.html_content.replace(/<[^>]*>/g, '').length;
+                height += Math.ceil(textLength / 100) * 9;
+            }
+            
+            // Add padding and margins
+            height += 20;
+            
+            return Math.min(height, 400);
+        }
+
+        // Fetch articles from Readwise API
+        async function fetchArticles() {
+            const token = document.getElementById('readwiseToken').value.trim();
+            const daysBack = parseInt(document.getElementById('daysBack').value) || 7;
+            
+            if (!token) {
+                showError('Please enter your Readwise token');
+                return;
+            }
+            
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const container = document.getElementById('container');
+            
+            loading.style.display = 'block';
+            error.style.display = 'none';
+            container.innerHTML = '';
+            
+            try {
+                // Calculate cutoff date
+                const cutoffDate = new Date();
+                cutoffDate.setDate(cutoffDate.getDate() - daysBack);
+                const formattedDate = cutoffDate.toISOString();
+                
+                let allArticles = [];
+                let nextPageCursor = '';
+                
+                do {
+                    // Build URL with parameters
+                    const params = new URLSearchParams({
+                        withHtmlContent: 'true',
+                        updatedAfter: formattedDate,
+                        location: 'new'
+                    });
+                    
+                    if (nextPageCursor) {
+                        params.append('pageCursor', nextPageCursor);
+                    }
+                    
+                    const url = `https://readwise.io/api/v3/list/?${params.toString()}`;
+                    
+                    const response = await fetch(url, {
+                        headers: {
+                            'Authorization': `Token ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    // Filter articles with content
+                    const validArticles = data.results.filter(article => 
+                        article.title && article.html_content
+                    );
+                    
+                    allArticles = allArticles.concat(validArticles);
+                    nextPageCursor = data.nextPageCursor || '';
+                    
+                } while (nextPageCursor);
+                
+                loading.style.display = 'none';
+                
+                if (allArticles.length === 0) {
+                    showError('No articles found for the specified time period');
+                    return;
+                }
+                
+                renderArticles(allArticles);
+                
+                console.log(`Fetched ${allArticles.length} articles from the last ${daysBack} days`);
+                
+            } catch (err) {
+                loading.style.display = 'none';
+                showError(`Error fetching articles: ${err.message}`);
+                console.error('Error:', err);
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            const error = document.getElementById('error');
+            error.textContent = message;
+            error.style.display = 'block';
+        }
+
+        // Load token from .env
+        async function loadTokenFromEnv() {
+            try {
+                const response = await fetch('/api/token');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('readwiseToken').value = data.token;
+                    localStorage.setItem('readwiseToken', data.token);
+                    updateEnvStatus('✅ Token loaded from .env file');
+                } else {
+                    showError(data.message || 'Failed to load token from .env file');
+                    updateEnvStatus('❌ ' + (data.message || 'No token in .env file'));
+                }
+            } catch (error) {
+                showError('Error loading token from .env file. Make sure the server is running.');
+                updateEnvStatus('❌ Server not running or .env file not found');
+            }
+        }
+
+        // Check environment status
+        async function checkEnvStatus() {
+            try {
+                const response = await fetch('/api/env-info');
+                const data = await response.json();
+                
+                if (data.hasToken) {
+                    updateEnvStatus('✅ .env file found with token - Click "Load from .env" to use it');
+                } else if (data.hasEnvFile) {
+                    updateEnvStatus('⚠️ .env file found but no READWISE_TOKEN');
+                } else {
+                    updateEnvStatus('💡 No .env file found - Create one with: READWISE_TOKEN=your_token');
+                }
+            } catch (error) {
+                updateEnvStatus('ℹ️ Running in standalone mode - server not available');
+            }
+        }
+
+        // Update environment status display
+        function updateEnvStatus(message) {
+            const statusDiv = document.getElementById('env-status');
+            if (statusDiv) {
+                statusDiv.textContent = message;
+            }
+        }
+
+        // Load token from localStorage if available, then check env status
+        window.addEventListener('load', () => {
+            const savedToken = localStorage.getItem('readwiseToken');
+            if (savedToken) {
+                document.getElementById('readwiseToken').value = savedToken;
+            }
+            
+            // Check if .env file has a token
+            checkEnvStatus();
+        });
+
+        // Save token to localStorage when changed
+        document.getElementById('readwiseToken').addEventListener('change', (e) => {
+            localStorage.setItem('readwiseToken', e.target.value);
+        });
+    </script>
+</body>
+</html> 
